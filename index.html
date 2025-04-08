@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yellow Zapper</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ff6b6b;
+            --secondary: #4ecdc4;
+            --light: #f7fff7;
+            --dark: #2f3e46;
+            --accent: #ffd166;
+        }
+        
+        body {
+            font-family: 'Nunito', 'Segoe UI', sans-serif;
+            background-color: #f9f7fe;
+            margin: 0;
+            padding: 0;
+            color: var(--dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .app-container {
+            max-width: 900px;
+            width: 95%;
+            margin: 2rem auto;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            border-radius: 24px;
+            background-color: white;
+            padding: 2rem;
+            overflow: hidden;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin: 0.5rem 0;
+            color: var(--primary);
+        }
+        
+        .tagline {
+            font-size: 1.1rem;
+            color: #666;
+            margin-top: 0;
+        }
+        
+        .upload-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            border: 3px dashed #ddd;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            transition: all 0.3s;
+            cursor: pointer;
+            background-color: #fafafa;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--secondary);
+            background-color: #f0f9f8;
+        }
+        
+        .upload-area.highlight {
+            border-color: var(--primary);
+            background-color: rgba(255, 107, 107, 0.05);
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            color: var(--secondary);
+            margin-bottom: 1rem;
+        }
+        
+        #imageFile {
+            display: none;
+        }
+        
+        .btn {
+            padding: 0.8rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #ff5252;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.3);
+        }
+        
+        .btn-primary:disabled {
+            background-color: #ccc;
+            transform: none;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+        
+        .images-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .image-card {
+            border-radius: 16px;
+            overflow: hidden;
+            background-color: white;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .image-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+        
+        .image-header {
+            padding: 1rem;
+            background-color: #f8f8f8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--dark);
+            border-bottom: 1px solid #eee;
+        }
+        
+        .image-header i {
+            margin-right: 0.5rem;
+            color: var(--primary);
+        }
+        
+        .image-preview {
+            width: 100%;
+            height: 300px;
+            object-fit: contain;
+            background-color: #fafafa;
+            padding: 1rem;
+            box-sizing: border-box;
+        }
+        
+        .image-actions {
+            padding: 1rem;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+        
+        .btn-download {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .btn-download:hover {
+            background-color: #3dbeb3;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(78, 205, 196, 0.3);
+        }
+        
+        .btn-download:disabled {
+            background-color: #ccc;
+            transform: none;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+        
+        .slider-container {
+            width: 100%;
+            margin: 0.5rem 0 1rem;
+            padding: 0.5rem;
+            background-color: #f0f7f6;
+            border-radius: 12px;
+        }
+        
+        .intensity-slider {
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(to right, var(--secondary), var(--primary));
+            border-radius: 5px;
+            -webkit-appearance: none;
+            appearance: none;
+            outline: none;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+            margin-top: 8px;
+        }
+        
+        .intensity-slider:hover {
+            opacity: 1;
+        }
+        
+        .intensity-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid var(--primary);
+            cursor: pointer;
+            box-shadow: 0 1px 6px rgba(0, 0, 0, 0.15);
+        }
+        
+        .intensity-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid var(--primary);
+            cursor: pointer;
+            box-shadow: 0 1px 6px rgba(0, 0, 0, 0.15);
+        }
+        
+        .placeholder-text {
+            text-align: center;
+            color: #aaa;
+            font-style: italic;
+            padding: 2rem;
+        }
+        
+        .loader {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary);
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+        }
+        
+        /* Fullscreen lightbox styles */
+        .lightbox-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        .lightbox-container {
+            width: 90%;
+            height: 90%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        .lightbox-header {
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .lightbox-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .lightbox-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .btn-close {
+            background-color: transparent;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .btn-close:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-compare {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .btn-compare:hover {
+            background-color: #3dbeb3;
+        }
+        
+        .btn-fullscreen {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            opacity: 0;
+        }
+        
+        .image-preview-container {
+            position: relative;
+        }
+        
+        .image-preview-container:hover .btn-fullscreen {
+            opacity: 1;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        /* Animation for cute feeling */
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .cute-animation {
+            animation: bounce 2s ease infinite;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .app-container {
+                padding: 1.5rem;
+                width: 90%;
+                margin: 1rem auto;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .images-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        footer {
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1><i class="fas fa-magic"></i> Yellow Zapper</h1>
+            <p class="tagline">Remove yellow tint from ChatGPT generated images instantly!</p>
+            
+            <!-- Lightbox for fullscreen view -->
+            <div id="lightboxOverlay" class="lightbox-overlay hidden">
+                <div class="lightbox-container">
+                    <div class="lightbox-header">
+                        <button id="compareButton" class="btn btn-compare">
+                            <i class="fas fa-exchange-alt"></i> Compare
+                        </button>
+                        <button id="closeLightbox" class="btn-close">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="lightbox-content">
+                        <img id="lightboxImage" class="lightbox-image" />
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <label for="imageFile" class="upload-area" id="dropArea">
+            <i class="fas fa-cloud-upload-alt upload-icon cute-animation"></i>
+            <p>Drop your image here or click to upload</p>
+            <input type="file" id="imageFile" accept="image/*" />
+        </label>
+        
+        <div class="images-container" id="imagesContainer">
+            <div class="image-card">
+                <div class="image-header">
+                    <i class="fas fa-image"></i> Original Image
+                </div>
+                <div class="image-preview-container">
+                    <img id="originalImage" class="image-preview" />
+                    <button class="btn-fullscreen" data-image="original">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                </div>
+                <div class="placeholder-text" id="originalPlaceholder">Your image will appear here</div>
+            </div>
+            
+            <div class="image-card">
+                <div class="image-header">
+                    <i class="fas fa-wand-magic-sparkles"></i> Fixed Image
+                </div>
+                <div class="image-preview-container">
+                    <img id="adjustedImage" class="image-preview" />
+                    <button class="btn-fullscreen" data-image="fixed">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                    <div class="loader" id="processingLoader"></div>
+                </div>
+                <div class="placeholder-text" id="adjustedPlaceholder">Yellow tint removed version will appear here</div>
+                <div class="image-actions">
+                    <div class="slider-container">
+                        <label for="intensitySlider">Filter Intensity: <span id="intensityValue">100%</span></label>
+                        <input type="range" id="intensitySlider" min="0" max="100" value="100" class="intensity-slider">
+                    </div>
+                    <a id="downloadButton" class="btn btn-download hidden" download="fixed-image.png">
+                        <i class="fas fa-download"></i> Download
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        Yellow Zapper • Made by Fatik <i class="fas fa-heart" style="color: var(--primary);"></i>  Who was tired of seeing his social feeds in yellow tint
+    </footer>
+
+    <script>
+        // Global variables
+        let imageData = null;
+        
+        // Curve adjustment based on the provided screenshot
+        const curveAdjustment = {
+            // Red curve - slightly above the baseline
+            r: [
+                [1, 2],         // Start point
+                [132, 127],     // Slightly below diagonal
+                [128, 125],     // Near diagonal
+                [245, 254],     // Slightly above diagonal
+                [255, 255]      // End point
+            ],
+            // Green curve - moderate boost in highlights
+            g: [
+                [2, 3],         // Start point  
+                [130, 127],     // Below diagonal
+                [128, 120],     // Slightly below diagonal
+                [225, 253],     // Above diagonal
+                [255, 255]      // End point
+            ],
+            // Blue curve - steepest, most aggressive adjustment
+            b: [
+                [1, 2],         // Start point
+                [120, 141],     // Above diagonal
+                [207, 254],     // Well above diagonal
+                [255, 255]      // End point
+            ],
+            // RGB composite curve - mostly follows baseline
+            rgb: [
+                [2, 1],
+                [64, 64],
+                [128, 128],
+                [253, 253],
+                [255, 255]
+            ]
+        };
+
+        // DOM elements
+        const imageFileInput = document.getElementById('imageFile');
+        const originalImage = document.getElementById('originalImage');
+        const adjustedImage = document.getElementById('adjustedImage');
+        const downloadButton = document.getElementById('downloadButton');
+        const originalPlaceholder = document.getElementById('originalPlaceholder');
+        const adjustedPlaceholder = document.getElementById('adjustedPlaceholder');
+        const processingLoader = document.getElementById('processingLoader');
+        const dropArea = document.getElementById('dropArea');
+        const intensitySlider = document.getElementById('intensitySlider');
+        const intensityValue = document.getElementById('intensityValue');
+        
+        // Lightbox elements
+        const lightboxOverlay = document.getElementById('lightboxOverlay');
+        const lightboxImage = document.getElementById('lightboxImage');
+        const compareButton = document.getElementById('compareButton');
+        const closeLightbox = document.getElementById('closeLightbox');
+        const fullscreenButtons = document.querySelectorAll('.btn-fullscreen');
+        
+        // Store original image data for reprocessing with different intensities
+        let originalImageData = null;
+        
+        // Track current image in lightbox
+        let currentLightboxImage = 'fixed';
+        let isShowingOriginal = false;
+
+        // Event listeners
+        imageFileInput.addEventListener('change', handleImageUpload);
+        intensitySlider.addEventListener('input', updateIntensity);
+        
+        // Lightbox event listeners
+        fullscreenButtons.forEach(button => {
+            button.addEventListener('click', openLightbox);
+        });
+        closeLightbox.addEventListener('click', () => {
+            lightboxOverlay.classList.add('hidden');
+        });
+        compareButton.addEventListener('click', toggleCompare);
+        
+        // Close lightbox with ESC key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !lightboxOverlay.classList.contains('hidden')) {
+                lightboxOverlay.classList.add('hidden');
+            }
+        });
+        
+        // Drag and drop functionality
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, highlight, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, unhighlight, false);
+        });
+        
+        function highlight() {
+            dropArea.classList.add('highlight');
+        }
+        
+        function unhighlight() {
+            dropArea.classList.remove('highlight');
+        }
+        
+        dropArea.addEventListener('drop', handleDrop, false);
+        
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files.length > 0) {
+                imageFileInput.files = files;
+                handleImageUpload({target: {files: files}});
+            }
+        }
+
+        // Open lightbox
+        function openLightbox(e) {
+            const imageType = e.currentTarget.getAttribute('data-image');
+            currentLightboxImage = imageType;
+            isShowingOriginal = false;
+            
+            if (imageType === 'original') {
+                lightboxImage.src = originalImage.src;
+                isShowingOriginal = true;
+            } else {
+                lightboxImage.src = adjustedImage.src;
+            }
+            
+            lightboxOverlay.classList.remove('hidden');
+        }
+        
+        // Toggle between original and fixed image
+        function toggleCompare() {
+            if (isShowingOriginal) {
+                lightboxImage.src = adjustedImage.src;
+                isShowingOriginal = false;
+            } else {
+                lightboxImage.src = originalImage.src;
+                isShowingOriginal = true;
+            }
+        }
+
+        // Handle image upload
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (!file.type.match('image.*')) {
+                alert('Please upload an image file!');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                originalImage.src = e.target.result;
+                originalImage.onload = function() {
+                    originalPlaceholder.classList.add('hidden');
+                    imageData = e.target.result;
+                    originalImageData = e.target.result; // Store original for reprocessing
+                    adjustedImage.src = '';
+                    adjustedPlaceholder.classList.remove('hidden');
+                    downloadButton.classList.add('hidden');
+                    
+                    // Reset intensity slider
+                    intensitySlider.value = 100;
+                    intensityValue.textContent = '100%';
+                    
+                    // Auto-process the image immediately
+                    processImage(100);
+                };
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // Handle intensity slider updates
+        function updateIntensity() {
+            const intensity = parseInt(intensitySlider.value);
+            intensityValue.textContent = intensity + '%';
+            
+            // Only reprocess if we have an image
+            if (originalImageData) {
+                processImage(intensity);
+            }
+        }
+
+        // Apply curve adjustment to image
+        function processImage(intensity = 100) {
+            if (!imageData) return;
+            
+            // Show loader
+            processingLoader.style.display = 'block';
+            
+            // Add slight delay to show the loader
+            setTimeout(() => {
+                const img = new Image();
+                img.onload = function() {
+                    // Create canvas to process the image
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    
+                    // Draw original image to canvas
+                    ctx.drawImage(img, 0, 0);
+                    
+                    // Get image data
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const data = imageData.data;
+                    
+                    // Apply curve adjustment with intensity
+                    applyCurveAdjustment(data, curveAdjustment, intensity / 100);
+                    
+                    // Put the modified image data back
+                    ctx.putImageData(imageData, 0, 0);
+                    
+                    // Set the result to the adjusted image
+                    const resultDataUrl = canvas.toDataURL();
+                    adjustedImage.src = resultDataUrl;
+                    adjustedImage.onload = function() {
+                        adjustedPlaceholder.classList.add('hidden');
+                        processingLoader.style.display = 'none';
+                        downloadButton.classList.remove('hidden');
+                        downloadButton.href = resultDataUrl;
+                    };
+                };
+                img.src = originalImageData; // Always use original image data
+            }, 100); // Small delay for UX
+        }
+
+        // Apply curve adjustment to image data
+        function applyCurveAdjustment(data, curves, intensityFactor = 1) {
+            // Create lookup tables for each channel
+            const rLUT = createLookupTable(curves.r, intensityFactor);
+            const gLUT = createLookupTable(curves.g, intensityFactor);
+            const bLUT = createLookupTable(curves.b, intensityFactor);
+            const rgbLUT = createLookupTable(curves.rgb, intensityFactor);
+            
+            // Apply lookup tables to image data
+            for (let i = 0; i < data.length; i += 4) {
+                // First apply individual channel curves
+                data[i] = rLUT[data[i]];         // R
+                data[i + 1] = gLUT[data[i + 1]]; // G
+                data[i + 2] = bLUT[data[i + 2]]; // B
+                
+                // Alpha channel remains unchanged
+            }
+        }
+
+        // Create a lookup table from curve points
+        function createLookupTable(curvePoints, intensityFactor) {
+            const lut = new Uint8Array(256);
+            
+            // For each possible input value (0-255)
+            for (let i = 0; i < 256; i++) {
+                // Calculate the adjusted value with the curve
+                const curveValue = interpolateCurve(i, curvePoints);
+                
+                // Apply intensity factor - blend between original and curve-adjusted value
+                lut[i] = Math.round(i + (curveValue - i) * intensityFactor);
+            }
+            
+            return lut;
+        }
+
+        // Interpolate between curve points to get output value
+        function interpolateCurve(input, points) {
+            // Find the two points that surround the input value
+            let lower = points[0];
+            let upper = points[points.length - 1];
+            
+            for (let i = 0; i < points.length - 1; i++) {
+                if (points[i][0] <= input && points[i + 1][0] > input) {
+                    lower = points[i];
+                    upper = points[i + 1];
+                    break;
+                }
+            }
+            
+            // If input is outside the range, use the extremes
+            if (input <= lower[0]) return lower[1];
+            if (input >= upper[0]) return upper[1];
+            
+            // Linear interpolation between the points
+            const t = (input - lower[0]) / (upper[0] - lower[0]);
+            return Math.round(lower[1] + t * (upper[1] - lower[1]));
+        }
+    </script>
+</body>
+</html>
