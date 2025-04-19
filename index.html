@@ -380,20 +380,118 @@
             animation: bounce 2s ease infinite;
         }
         
-        /* Responsive adjustments */
+        /* Enhanced responsive adjustments */
         @media (max-width: 768px) {
             .app-container {
-                padding: 1.5rem;
-                width: 90%;
-                margin: 1rem auto;
+                padding: 1rem;
+                width: 95%;
+                margin: 0.5rem auto;
+                border-radius: 16px;
             }
             
             h1 {
-                font-size: 2rem;
+                font-size: 1.8rem;
+            }
+            
+            .tagline {
+                font-size: 1rem;
             }
             
             .images-container {
                 grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .upload-area {
+                padding: 1.5rem 1rem;
+            }
+            
+            .upload-icon {
+                font-size: 2.5rem;
+            }
+            
+            .btn {
+                padding: 0.7rem 1.5rem;
+                font-size: 1rem;
+            }
+            
+            .image-preview {
+                height: 250px;
+            }
+            
+            .image-actions {
+                flex-direction: column;
+            }
+            
+            .slider-container {
+                width: 100%;
+                margin-bottom: 1rem;
+            }
+            
+            .lightbox-container {
+                width: 95%;
+                height: 95%;
+            }
+        }
+        
+        /* Additional mobile optimizations */
+        @media (max-width: 480px) {
+            .app-container {
+                padding: 0.8rem;
+                width: 98%;
+                margin: 0.3rem auto;
+                border-radius: 12px;
+            }
+            
+            h1 {
+                font-size: 1.6rem;
+            }
+            
+            .upload-area {
+                padding: 1.2rem 0.8rem;
+            }
+            
+            .image-preview {
+                height: 200px;
+            }
+            
+            .btn-fullscreen {
+                width: 35px;
+                height: 35px;
+                opacity: 0.7; /* Always visible on mobile */
+            }
+            
+            .lightbox-header {
+                padding: 0.7rem;
+            }
+            
+            footer {
+                font-size: 0.8rem;
+                margin-top: 1rem;
+                margin-bottom: 0.5rem;
+                padding: 0 1rem;
+            }
+        }
+        
+        /* Touch-friendly improvements */
+        @media (hover: none) {
+            .btn-fullscreen {
+                opacity: 0.7; /* Always visible on touch devices */
+            }
+            
+            .btn, .btn-close, .btn-fullscreen {
+                min-height: 44px; /* Minimum touch target size */
+                min-width: 44px;
+            }
+            
+            .intensity-slider::-webkit-slider-thumb {
+                width: 24px;
+                height: 24px;
+            }
+            
+            .intensity-slider::-moz-range-thumb {
+                width: 24px;
+                height: 24px;
             }
         }
         
